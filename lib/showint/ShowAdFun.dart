@@ -32,7 +32,9 @@ class ShowAdFun {
   bool isBackAdLoading = false;
 
   bool isFistOpen = false;
-  int adLoadTimes = 0;
+  int adLoadTimesOpen = 0;
+  int adLoadTimesBack = 0;
+  int adLoadTimesSave = 0;
 
   void loadAd(AdWhere adPosition) async {
     if (adPosition == AdWhere.OPEN && _isAppOpenAdLoading) {
@@ -65,7 +67,7 @@ class ShowAdFun {
         _loadAppOpenAdWithRetry();
         break;
       case AdWhere.BACKINT:
-        _loadAppOpenIntAdWithRetry();
+        _loadAppBackIntAdWithRetry();
         break;
       case AdWhere.SAVE:
         _loadInterstitialAdWithRetry(adPosition);
@@ -82,12 +84,13 @@ class ShowAdFun {
       adLoadCallback: AppOpenAdLoadCallback(
         onAdLoaded: (ad) {
           print("open广告加载成功");
-          adLoadTimes = DateTime.now().millisecondsSinceEpoch;
+          adLoadTimesOpen = DateTime.now().millisecondsSinceEpoch;
           _appOpenAd = ad;
           _isAppOpenAdLoading = false;
           isFistOpen = false;
         },
         onAdFailedToLoad: (error) {
+          adLoadTimesOpen = 0;
           print('open广告加载失败: $error');
           _isAppOpenAdLoading = false;
           _appOpenAd = null;
@@ -101,8 +104,8 @@ class ShowAdFun {
     );
   }
 
-  void _loadAppOpenIntAdWithRetry() {
-    _isAppOpenAdLoading = true;
+  void _loadAppBackIntAdWithRetry() {
+    isBackAdLoading = true;
     print("加载AdWhere.BACKINT广告 id=$openId");
     InterstitialAd.load(
       adUnitId: backIntId,
@@ -110,17 +113,18 @@ class ShowAdFun {
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           print("加载AdWhere.BACKINT广告加载成功");
-          adLoadTimes = DateTime.now().millisecondsSinceEpoch;
+          adLoadTimesBack = DateTime.now().millisecondsSinceEpoch;
           _appBackAdInt = ad;
-          _isAppOpenAdLoading = false;
+          isBackAdLoading = false;
         },
         onAdFailedToLoad: (error) {
+          adLoadTimesBack = 0;
           print("加载AdWhere.BACKINT广告加载失败：${error}");
-          _isAppOpenAdLoading = false;
+          isBackAdLoading = false;
           _appBackAdInt = null;
           if (!isFistOpen) {
             isFistOpen = true;
-            _loadAppOpenIntAdWithRetry();
+            _loadAppBackIntAdWithRetry();
           }
         },
       ),
@@ -138,11 +142,12 @@ class ShowAdFun {
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           print("加载${adPosition}广告加载成功");
-          adLoadTimes = DateTime.now().millisecondsSinceEpoch;
+          adLoadTimesSave = DateTime.now().millisecondsSinceEpoch;
           _interstitialAd = ad;
           isSaveAdLoading = false;
         },
         onAdFailedToLoad: (error) {
+          adLoadTimesSave = 0;
           print("加载${adPosition}广告加载失败：${error}");
           isSaveAdLoading = false;
           _interstitialAd = null;
@@ -154,11 +159,17 @@ class ShowAdFun {
   bool canMoreAd(AdWhere adWhere) {
     int now = DateTime.now().millisecondsSinceEpoch;
     if (adWhere == AdWhere.OPEN) {
-      return _appOpenAd != null && now - adLoadTimes > 4 * 60 * 60 * 1000;
+      return _appOpenAd != null &&
+          adLoadTimesOpen != 0 &&
+          now - adLoadTimesOpen > 4 * 60 * 60 * 1000;
     } else if (adWhere == AdWhere.BACKINT) {
-      return _appBackAdInt != null && now - adLoadTimes > 50 * 60 * 1000;
+      return _appBackAdInt != null &&
+          adLoadTimesBack != 0 &&
+          now - adLoadTimesBack > 50 * 60 * 1000;
     } else {
-      return _interstitialAd != null && now - adLoadTimes > 50 * 60 * 1000;
+      return _interstitialAd != null &&
+          adLoadTimesSave != 0 &&
+          now - adLoadTimesSave > 50 * 60 * 1000;
     }
   }
 
