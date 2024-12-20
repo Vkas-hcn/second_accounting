@@ -51,7 +51,6 @@ class _CategoryPageState extends State<CategoryPage>
   }
 
   void jumpToAddCategoryPage() {
-    showAdNextPaper(AdWhere.SAVE, () {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -61,7 +60,6 @@ class _CategoryPageState extends State<CategoryPage>
       ).then((value) {
         clickSelect(seletIndex);
       });
-    });
   }
 
   void deleteCategory(int index) {
@@ -100,24 +98,6 @@ class _CategoryPageState extends State<CategoryPage>
     setState(() {});
   }
 
-  void showAdNextPaper(AdWhere adWhere, Function() nextJump) async {
-    if (!adManager.canShowAd(adWhere)) {
-      adManager.loadAd(adWhere);
-    }
-    setState(() {
-      _loadingOverlay.show(context);
-    });
-    AppUtils.showScanAd(context, adWhere, 5, false,() {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-    }, () {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-      nextJump();
-    });
-  }
 
   void nextJump() {
     Navigator.pop(context);
@@ -128,9 +108,7 @@ class _CategoryPageState extends State<CategoryPage>
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          showAdNextPaper(AdWhere.BACKINT, () {
             nextJump();
-          });
           return false;
         },
         child: Container(
@@ -147,9 +125,7 @@ class _CategoryPageState extends State<CategoryPage>
                     children: [
                       GestureDetector(
                         onTap: () {
-                          showAdNextPaper(AdWhere.BACKINT, () {
                             nextJump();
-                          });
                         },
                         child: SizedBox(
                           width: 24,

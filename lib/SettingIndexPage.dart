@@ -24,25 +24,6 @@ class _SettingIndexPageState extends State<SettingIndexPage>
     adManager = AppUtils.getMobUtils(context);
   }
 
-  void showAdNextPaper(AdWhere adWhere, Function() nextJump) async {
-    if (!adManager.canShowAd(adWhere)) {
-      adManager.loadAd(adWhere);
-    }
-    setState(() {
-      _loadingOverlay.show(context);
-    });
-    AppUtils.showScanAd(context, adWhere, 5, false,() {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-    }, () {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-      nextJump();
-    });
-  }
-
   void nextJump() {
     Navigator.pop(context);
   }
@@ -52,9 +33,7 @@ class _SettingIndexPageState extends State<SettingIndexPage>
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          showAdNextPaper(AdWhere.BACKINT, () {
-            nextJump();
-          });
+          nextJump();
           return false;
         },
         child: Container(
@@ -71,9 +50,7 @@ class _SettingIndexPageState extends State<SettingIndexPage>
                     children: [
                       GestureDetector(
                         onTap: () {
-                          showAdNextPaper(AdWhere.BACKINT, () {
-                            nextJump();
-                          });
+                          nextJump();
                         },
                         child: SizedBox(
                           width: 24,

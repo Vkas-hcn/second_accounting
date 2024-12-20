@@ -204,31 +204,25 @@ class _MainAppState extends State<MainApp> {
   }
 
   void jumpToSetting() {
-    showAdNextPaper(AdWhere.SAVE, false, () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const SettingIndexPage()),
-      );
-    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SettingIndexPage()),
+    );
   }
 
   void jumpToDetailPage() {
-    showAdNextPaper(AdWhere.SAVE, false, () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const DataDetailPage()),
-      );
-    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const DataDetailPage()),
+    );
   }
 
   void jumpToCategoryPage() {
-    showAdNextPaper(AdWhere.SAVE, false, () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => CategoryPage()),
-      ).then((value) {
-        getHomeListData(type);
-      });
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CategoryPage()),
+    ).then((value) {
+      getHomeListData(type);
     });
   }
 
@@ -303,28 +297,8 @@ class _MainAppState extends State<MainApp> {
     } catch (e) {
       Fluttertoast.showToast(
           msg:
-          "Access to your photo album is required to select images to add to the bill.");
+              "Access to your photo album is required to select images to add to the bill.");
     }
-  }
-
-
-    void showAdNextPaper(AdWhere adWhere, bool isTwo, Function() nextJump) async {
-    if (!adManager.canShowAd(adWhere)) {
-      adManager.loadAd(adWhere);
-    }
-    setState(() {
-      _loadingOverlay.show(context);
-    });
-    AppUtils.showScanAd(context, adWhere, 5, isTwo, () {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-    }, () {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-      nextJump();
-    });
   }
 
   @override
@@ -540,15 +514,11 @@ class _MainAppState extends State<MainApp> {
                     } else {
                       return NumberInputWidget(
                         onAdd: (value) {
-                          showAdNextPaper(AdWhere.SAVE, true, () {
-                            saveToNextPaper(value, false);
-                          });
+                          saveToNextPaper(value, false);
                         },
                         stateImage: snapshot.data!,
                         again: (value) {
-                          showAdNextPaper(AdWhere.SAVE, true, () {
-                            saveToNextPaper(value, true);
-                          });
+                          saveToNextPaper(value, true);
                         },
                         seassets: (value) {},
                       );
@@ -767,7 +737,7 @@ class _MainAppState extends State<MainApp> {
                                             Text(
                                               items[index],
                                               style: const TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 10,
                                                 color: Colors.black,
                                               ),
                                               textAlign: TextAlign.center,

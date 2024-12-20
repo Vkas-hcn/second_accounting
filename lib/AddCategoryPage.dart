@@ -47,24 +47,6 @@ class _AddCategoryPageState extends State<AddCategoryPage>
     return await DataUtils.getImageByText(DataUtils.zongText[index]);
   }
 
-  void showAdNextPaper(AdWhere adWhere, Function() nextJump) async {
-    if (!adManager.canShowAd(adWhere)) {
-      adManager.loadAd(adWhere);
-    }
-    setState(() {
-      _loadingOverlay.show(context);
-    });
-    AppUtils.showScanAd(context, adWhere, 5, false, () {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-    }, () {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-      nextJump();
-    });
-  }
 
   void nextJump() {
     Navigator.pop(context);
@@ -115,9 +97,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          showAdNextPaper(AdWhere.BACKINT, () {
             nextJump();
-          });
           return false;
         },
         child: Container(
@@ -134,9 +114,7 @@ class _AddCategoryPageState extends State<AddCategoryPage>
                     children: [
                       GestureDetector(
                         onTap: () {
-                          showAdNextPaper(AdWhere.BACKINT, () {
                             nextJump();
-                          });
                         },
                         child: SizedBox(
                           width: 24,

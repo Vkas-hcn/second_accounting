@@ -30,6 +30,7 @@ class _DataDetailPageState extends State<DataDetailPage>
   double totalNum = 0.0;
   late ShowAdFun adManager;
   final AdShowui _loadingOverlay = AdShowui();
+
   @override
   void initState() {
     super.initState();
@@ -49,7 +50,7 @@ class _DataDetailPageState extends State<DataDetailPage>
   List<String> getBgList(List<ZhiShouData> zhiShouData, index1) {
     List<dynamic> dynamicList = jsonDecode(zhiShouData[index1].bgImageList);
     List<String> bgImageList =
-    dynamicList.map((item) => item.toString()).toList();
+        dynamicList.map((item) => item.toString()).toList();
     return bgImageList;
   }
 
@@ -120,37 +121,18 @@ class _DataDetailPageState extends State<DataDetailPage>
 
     setState(() {});
   }
-  void showAdNextPaper(AdWhere adWhere, Function() nextJump) async {
-    if (!adManager.canShowAd(adWhere)) {
-      adManager.loadAd(adWhere);
-    }
-    setState(() {
-      _loadingOverlay.show(context);
-    });
-    AppUtils.showScanAd(context, adWhere, 5, false, () {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-    }, () {
-      setState(() {
-        _loadingOverlay.hide();
-      });
-      nextJump();
-    });
-  }
 
   void nextJump() {
     Navigator.pop(context);
   }
+
   @override
   Widget build(BuildContext context) {
     nowDate = DateFormat('yyyy-MM').format(selectedDate);
     return Scaffold(
       body: WillPopScope(
         onWillPop: () async {
-          showAdNextPaper(AdWhere.BACKINT, () {
-            nextJump();
-          });
+          nextJump();
           return false;
         },
         child: Container(
@@ -165,15 +147,13 @@ class _DataDetailPageState extends State<DataDetailPage>
                 children: [
                   Padding(
                     padding:
-                    const EdgeInsets.only(top: 60.0, left: 20, right: 20),
+                        const EdgeInsets.only(top: 60.0, left: 20, right: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         GestureDetector(
                           onTap: () {
-                            showAdNextPaper(AdWhere.BACKINT, () {
-                              nextJump();
-                            });
+                            nextJump();
                           },
                           child: SizedBox(
                             width: 24,
@@ -326,7 +306,7 @@ class _DataDetailPageState extends State<DataDetailPage>
                               ),
                               const Spacer(),
                               Text(
-                                'Balance: ${totalNum>0?'+':''}${totalNum}',
+                                'Balance: ${totalNum > 0 ? '+' : ''}${totalNum}',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontFamily: 'san',
@@ -349,12 +329,15 @@ class _DataDetailPageState extends State<DataDetailPage>
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.only(
-                                        top: 9.0, left: 1, right: 9, bottom: 11),
+                                        top: 9.0,
+                                        left: 1,
+                                        right: 9,
+                                        bottom: 11),
                                     child: Column(
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           mainAxisSize: MainAxisSize.max,
                                           children: [
                                             SizedBox(
@@ -369,17 +352,16 @@ class _DataDetailPageState extends State<DataDetailPage>
                                             Flexible(
                                               child: Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     stateList[index].name,
                                                     style: const TextStyle(
                                                       fontWeight:
-                                                      FontWeight.w700,
+                                                          FontWeight.w700,
                                                       fontFamily: 'san',
                                                       fontSize: 14,
-                                                      color:
-                                                      Color(0xFF000000),
+                                                      color: Color(0xFF000000),
                                                     ),
                                                   ),
                                                   const SizedBox(height: 8),
@@ -387,9 +369,10 @@ class _DataDetailPageState extends State<DataDetailPage>
                                                     stateList[index].note,
                                                     maxLines: 3,
                                                     overflow:
-                                                    TextOverflow.ellipsis,
+                                                        TextOverflow.ellipsis,
                                                     style: const TextStyle(
-                                                      fontWeight: FontWeight.w700,
+                                                      fontWeight:
+                                                          FontWeight.w700,
                                                       fontFamily: 'san',
                                                       fontSize: 12,
                                                       color: Color(0xFF7B7B7B),
@@ -404,11 +387,12 @@ class _DataDetailPageState extends State<DataDetailPage>
                                                 // Specify the height here
                                                 child: ListView.builder(
                                                   scrollDirection:
-                                                  Axis.horizontal,
-                                                  itemCount:
-                                                  getBgList(stateList, index)
+                                                      Axis.horizontal,
+                                                  itemCount: getBgList(
+                                                          stateList, index)
                                                       .length,
-                                                  itemBuilder: (context, index2) {
+                                                  itemBuilder:
+                                                      (context, index2) {
                                                     return GestureDetector(
                                                       onTap: () {
                                                         showImageDialog(
@@ -420,15 +404,16 @@ class _DataDetailPageState extends State<DataDetailPage>
                                                         height: 68,
                                                         width: 68,
                                                         child: Stack(
-                                                          alignment:
-                                                          Alignment.topRight,
+                                                          alignment: Alignment
+                                                              .topRight,
                                                           children: [
                                                             Center(
-                                                              child: CustomCircle(
+                                                              child:
+                                                                  CustomCircle(
                                                                 img: getBgList(
-                                                                    stateList,
-                                                                    index)[
-                                                                index2],
+                                                                        stateList,
+                                                                        index)[
+                                                                    index2],
                                                               ),
                                                             ),
                                                           ],
@@ -450,21 +435,20 @@ class _DataDetailPageState extends State<DataDetailPage>
                                                     fontFamily: 'san',
                                                     fontSize: 12,
                                                     color:
-                                                    stateList[index].type == 1
-                                                        ? Color(0xFFFF9C50)
-                                                        : Color(0xFF22C764),
+                                                        stateList[index].type ==
+                                                                1
+                                                            ? Color(0xFFFF9C50)
+                                                            : Color(0xFF22C764),
                                                   ),
                                                 ),
                                                 const SizedBox(height: 10),
                                                 Text(
                                                   stateList[index].date,
                                                   style: const TextStyle(
-                                                    fontWeight:
-                                                    FontWeight.w700,
+                                                    fontWeight: FontWeight.w700,
                                                     fontFamily: 'san',
                                                     fontSize: 12,
-                                                    color:
-                                                    Color(0xFF7B7B7B),
+                                                    color: Color(0xFF7B7B7B),
                                                   ),
                                                 ),
                                               ],
@@ -560,8 +544,9 @@ class _DataDetailPageState extends State<DataDetailPage>
                   DropdownButton<int>(
                     value: selectedYear,
                     items: List.generate(
-                      currentDate.year - 1999, // Generate years from 2000 to current year
-                          (index) => DropdownMenuItem(
+                      currentDate.year - 1999,
+                      // Generate years from 2000 to current year
+                      (index) => DropdownMenuItem(
                         value: 2000 + index,
                         child: Text((2000 + index).toString()),
                       ),
@@ -576,9 +561,10 @@ class _DataDetailPageState extends State<DataDetailPage>
                     value: selectedMonth,
                     items: List.generate(
                       12,
-                          (index) => DropdownMenuItem(
+                      (index) => DropdownMenuItem(
                         value: index + 1,
-                        child: Text(DateFormat.MMMM().format(DateTime(0, index + 1))),
+                        child: Text(
+                            DateFormat.MMMM().format(DateTime(0, index + 1))),
                       ),
                     ),
                     onChanged: (int? value) {
@@ -620,5 +606,4 @@ class _DataDetailPageState extends State<DataDetailPage>
       displayMonthlyData(nowDate, seletIndex);
     }
   }
-
 }

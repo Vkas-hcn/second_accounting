@@ -5,7 +5,6 @@ import 'package:second_accounting/showint/LTFDW.dart';
 import 'package:second_accounting/showint/ShowAdFun.dart';
 import 'package:second_accounting/utils/AppUtils.dart';
 import 'package:second_accounting/utils/LocalStorage.dart';
-import 'package:user_messaging_platform/user_messaging_platform.dart';
 
 import 'MainApp.dart';
 
@@ -34,15 +33,13 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   bool restartState = false;
   final Duration checkInterval = const Duration(milliseconds: 500);
   late LTFDW Ltfdw;
-  final _ump = UserMessagingPlatform.instance;
-  final String _testDeviceId = "F8F8F8A6A1ECD38483E6997F3C5220BB";
+  final String _testDeviceId = "202C0DAA36EB5148BDEA8A1E6E36A4B6";
   late StreamSubscription _umpStateSubscription;
   DateTime? _pausedTime;
 
   @override
   void initState() {
     super.initState();
-    requestConsentInfoUpdate();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startProgress();
     });
@@ -85,38 +82,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  void loadingGuideAd() {
-    AppUtils.getMobUtils(context).loadAd(AdWhere.OPEN);
-    Future.delayed(const Duration(seconds: 2), () {
-      AppUtils.getMobUtils(context).loadAd(AdWhere.BACKINT);
-      AppUtils.getMobUtils(context).loadAd(AdWhere.SAVE);
-      showOpenAd();
-    });
-  }
 
-  void showOpenAd() async {
-    int elapsed = 0;
-    const int timeout = 12000;
-    const int interval = 500;
-    print("准备展示open广告");
-    Timer.periodic(const Duration(milliseconds: interval), (timer) {
-      elapsed += interval;
-      if (AppUtils.getMobUtils(context).canShowAd(AdWhere.OPEN)) {
-        AppUtils.getMobUtils(context).showAd(context, AdWhere.OPEN, () {
-          print("关闭广告-------");
-          pageToHome();
-        });
-        timer.cancel();
-      } else if (elapsed >= timeout) {
-        print("超时，直接进入首页");
-        pageToHome();
-        timer.cancel();
-      }
-    });
-  }
+
 
   void _startProgress() {
-    const int totalDuration = 12000; // Total duration in milliseconds
+    const int totalDuration = 2000; // Total duration in milliseconds
     const int updateInterval = 50; // Update interval in milliseconds
     const int totalUpdates = totalDuration ~/ updateInterval;
     int currentUpdate = 0;
@@ -129,6 +99,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       currentUpdate++;
       if (currentUpdate >= totalUpdates) {
         _timerProgress?.cancel();
+        pageToHome();
       }
     });
   }
@@ -147,67 +118,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       if (umpState) {
         _umpStateSubscription.cancel();
         _startProgress();
-        loadingGuideAd();
       }
     });
   }
-  Future<void> requestConsentInfoUpdate() async {
-    bool? data = await LocalStorage().getValue(LocalStorage.umpState);
-    print("requestConsentInfoUpdate---${data}");
-    if (data == true) {
-      loadingGuideAd();
-      return;
-    }
-    _startMonitoringUmpState();
 
-    int retryCount = 0;
-    const maxRetries = 1;
-
-    while (retryCount <= maxRetries) {
-      try {
-        final info = await _ump
-            .requestConsentInfoUpdate(_buildConsentRequestParameters());
-        print("requestConsentInfoUpdate---->${info.consentStatus}");
-        if (info.consentStatus == ConsentStatus.required) {
-          showConsentForm();
-        } else {
-          LocalStorage().setValue(LocalStorage.umpState, true);
-        }
-        break;
-      } catch (e) {
-        if (e is PlatformException && e.code == 'timeout') {
-          retryCount++;
-          if (retryCount > maxRetries) {
-            LocalStorage().setValue(LocalStorage.umpState, true);
-            return;
-          }
-          print("Request timed out, retrying... ($retryCount/$maxRetries)");
-          await Future.delayed(Duration(seconds: 1));
-        } else {
-          LocalStorage().setValue(LocalStorage.umpState, true);
-          return;
-        }
-      }
-    }
-  }
-
-  ConsentRequestParameters _buildConsentRequestParameters() {
-    final parameters = ConsentRequestParameters(
-      tagForUnderAgeOfConsent: false,
-      debugSettings: ConsentDebugSettings(
-        geography: DebugGeography.EEA,
-        testDeviceIds: [_testDeviceId],
-      ),
-    );
-    return parameters;
-  }
-
-  Future<void> showConsentForm() {
-    return _ump.showConsentForm().then((info) {
-      print("showConsentForm---->${info.consentStatus}");
-      LocalStorage().setValue(LocalStorage.umpState, true);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {

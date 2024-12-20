@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     print("object=================main");
-    Get2Data().getBlackList(context);
+    // Get2Data().getBlackList(context);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       pageToHome();
     });
